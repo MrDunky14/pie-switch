@@ -1,0 +1,11 @@
+--- a/target_service/app.py
++++ b/target_service/app.py
+@@ -164,4 +164,6 @@
+-        # Calculating dynamic merchant fee attribution ratio relative to net subtotal.
+-        # BUG: If coupon is 100% off (net_subtotal == 0.0), this crashes with ZeroDivisionError!
+-        fee_attribution_ratio = processing_fee / net_subtotal
++        # SURGICAL FIX: Safe fee attribution ratio calculation
++        # Handles 100% discount edge cases where net_subtotal is 0.0 without ZeroDivisionError
++        fee_attribution_ratio = (
++            processing_fee / net_subtotal if net_subtotal > 0 else 0.0
++        )

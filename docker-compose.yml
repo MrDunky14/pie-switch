@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  target_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pie_target_service
+    ports:
+      - "8080:8080"
+    environment:
+      - MODE=${MODE:-business}
+      - TARGET_SERVICE_HOST=0.0.0.0
+      - TARGET_SERVICE_PORT=8080
+      - LOG_FILE_PATH=/app/workspace/service.log
+    volumes:
+      - ./target_service:/app/target_service
+      - ./workspace:/app/workspace
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  watchdog_agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pie_watchdog_agent
+    depends_on:
+      target_service:
+        condition: service_healthy
+    environment:
+      - MODE=${MODE:-business}
+      - TEAM_NAME=${TEAM_NAME:-pie}
+      - SWITCH_SERVER_URL=${SWITCH_SERVER_URL:-http://host.docker.internal:8000}
+      - SWITCH_ROOM_ID=${SWITCH_ROOM_ID:-pie-war-room}
+      - TARGET_SERVICE_URL=http://target_service:8080
+      - LOG_FILE_PATH=/app/workspace/service.log
+      - PATCH_FILE_PATH=/app/workspace/patches/fix.patch
+      - REPRO_FILE_PATH=/app/workspace/repro/repro_bug.py
+      - CREATOR_HANDLE=${CREATOR_HANDLE:-@alex}
+    volumes:
+      - ./agents:/app/agents
+      - ./workspace:/app/workspace
+      - ./target_service:/app/target_service
+    command: ["python", "agents/watchdog_sse_agent.py", "--local-sim"]
+    restart: unless-stopped
