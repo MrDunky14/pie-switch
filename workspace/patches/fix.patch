@@ -1,11 +1,16 @@
+diff --git a/target_service/app.py b/target_service/app.py
+index 487a2a6..56aa728 100644
 --- a/target_service/app.py
 +++ b/target_service/app.py
-@@ -164,4 +164,6 @@
--        # Calculating dynamic merchant fee attribution ratio relative to net subtotal.
--        # BUG: If coupon is 100% off (net_subtotal == 0.0), this crashes with ZeroDivisionError!
+@@ -164,7 +164,10 @@ async def checkout(request: CheckoutRequest) -> Dict[str, Any]:
+         # ----------------------------------------------------------------------
+         # Calculating dynamic merchant fee attribution ratio relative to net subtotal.
+         # BUG: If coupon is 100% off (net_subtotal == 0.0), this crashes with ZeroDivisionError!
 -        fee_attribution_ratio = processing_fee / net_subtotal
 +        # SURGICAL FIX: Safe fee attribution ratio calculation
-+        # Handles 100% discount edge cases where net_subtotal is 0.0 without ZeroDivisionError
 +        fee_attribution_ratio = (
 +            processing_fee / net_subtotal if net_subtotal > 0 else 0.0
 +        )
+ 
+         tax = round(net_subtotal * request.tax_rate, 2)
+         total = round(net_subtotal + tax + processing_fee, 2)
