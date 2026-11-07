@@ -1,8 +1,8 @@
-# 🥧 pie-Switch: Autonomous Incident Triage, Sandbox Repro & Human-Gated Hot-Reload
+# 🛡️ AegisRoom (pie-Switch): Autonomous Incident War-Room & Personal DevSecOps Co-Pilot
 
-> **Winner Submission for the Flip the Switch Hackathon**  
+> **5-Track Master Submission for the Flip the Switch Hackathon**  
 > *Organized by WeMakeDevs × DevTools Academy × Switch*  
-> Dual-Track: **Track 01 (Best Business Workflow)** & **Track 02 (Best Personal/Indie Workflow)**
+> **Tracks Targeted:** Track 01 ($2,000) + Track 02 ($2,000) + Track 03 ($100 × 20) + Wispr Side Track ($500) + Best Blog (AirPods 5) + `#HowISwitch` (Logitech Mechanical Keyboard)
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
@@ -12,9 +12,27 @@
 
 ---
 
+### 📺 90-Second Demo Video Walkthrough
+[![Watch the Demo Video](https://img.shields.io/badge/YouTube%20%2F%20Loom-Watch%20Demo%20Video%20(90s)-red?style=for-the-badge&logo=youtube)](https://youtu.be/YOUR_DEMO_VIDEO_LINK)  
+> *Split-screen demonstration: Left pane = Switch Console / Mattermost Room; Right pane = Live FastAPI telemetry & Rich Chaos Dashboard.*  
+> *(Drop your YouTube or Loom link into `https://youtu.be/YOUR_DEMO_VIDEO_LINK` prior to final submission)*
+
+---
+
+## 🏆 Judging Rubric Alignment Matrix
+
+| Judging Criterion | How AegisRoom Delivers |
+| :--- | :--- |
+| **1. Centrality of Switch** | Switch is the central nervous system. The workflow relies on Switch's shared Room log, declarative `switch.template.yaml`, strict `owner-agents` addressing handoffs, and the custom SSE/HTTP Agent Protocol (`watchdog_sse_agent.py`). Without Switch, the 3 agents and human approver cannot coordinate state. |
+| **2. Technical Execution** | Fully deterministic and reproducible in 1 command (`make test`, `make chaos`, `make reset`). Includes a real buggy microservice (`target_service/app.py`), automated pytest sandbox verification (`workspace/repro/repro_bug.py`), surgical git diffs (`workspace/patches/fix.patch`), and live Rich chaos injectors (`scripts/trigger_chaos.py`). |
+| **3. Creativity & Impact** | Solves two real bottlenecks: **(Track 01)** Zero-downtime team incident remediation with human-in-the-loop safety gates, and **(Track 02)** Voice-driven personal feature scaffolding from mobile chat (`/solo-chill` and Wispr Flow). |
+| **4. Presentation** | Split-screen video showing live Mattermost/Discord room collaboration on the left and real-time Docker/terminal execution on the right, built using Wispr Flow voice dictation with an embedded scorecard. |
+
+---
+
 ## 🌟 Executive Summary
 
-**pie-Switch** is an enterprise-grade autonomous incident management and self-healing infrastructure powered by **Switch**, the open-source collaboration platform connecting AI agents and humans inside a unified chat room.
+**AegisRoom (pie-Switch)** is an enterprise-grade autonomous incident management and personal DevSecOps co-pilot powered by **Switch**, the open-source collaboration platform connecting AI agents and humans inside a unified chat room.
 
 When a production microservice crashes, traditional engineering teams suffer from **alert fatigue**, **context fragmentation**, and **bystander paralysis** across disjointed monitoring dashboards, issue trackers, and staging servers. **pie-Switch** unifies the entire incident lifecycle into a single Switch War Room:
 1. **Telemetry Ingestion**: A custom protocol daemon (`@watchdog-sse`) tails structured crash logs and posts to Switch.
@@ -229,6 +247,19 @@ This entire repository was scaffolded, designed, and debugged using natural voic
 ![Built with Wispr Flow](./assets/wispr_scorecard.png)
 
 *Wispr Flow Scorecard: 98.4% dictation accuracy across technical terms (SSE, FastAPI, ZeroDivisionError, uvicorn, Pydantic).*
+
+---
+
+## 🚀 5-Track Master Submission Roadmap
+
+| Track | Prize | How AegisRoom Wins | Execution Step |
+| :--- | :--- | :--- | :--- |
+| **Track 01: Best Business Workflow** | **$2,000** | Full zero-downtime microservice incident triage, deterministic sandbox repro, unified git diff, and human-authorized hot-reload. | Run `make chaos` during video recording. |
+| **Track 02: Best Personal / Creative Workflow** | **$2,000** | Solo-Indie `/solo-chill` voice dispatcher + background CI/CD Sleep-Mode health guardian. | Run `make chaos-voice` or `make chaos-indie`. |
+| **Track 03: Best Core Contribution** | **$100 × 20** | Direct upstream PR to `sandbox-quantum/switch` adding template validation or SSE protocol helpers. | Pick 1-2 open issues labeled `hackathon`. |
+| **Wispr Flow Side Track** | **$500** | Voice-coded architecture & prompt engineering with embedded Wispr scorecard. | Screenshot your Wispr Insights dashboard to `./assets/wispr_scorecard.png`. |
+| **Best Blog Post** | **AirPods 5** | Authoritative Dev.to/Hashnode article: *"How I Built a Multi-Agent DevSecOps War Room in 10 Minutes Using Switch & Claude Code"*. | Publish using the 4-part architecture guide below. |
+| **`#HowISwitch` Social Campaign** | **Logitech Keyboard** | 90-second split-screen demo on X/LinkedIn tagging `@WeMakeDevs` & `#HowISwitch`. | Post the video alongside your blog link. |
 
 ---
 

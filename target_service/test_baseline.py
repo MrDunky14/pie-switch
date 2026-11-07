@@ -127,6 +127,22 @@ def test_indie_webhook_failure_alert():
     assert data["severity"] == "P1-HIGH"
 
 
+def test_voice_idea_endpoint():
+    """Validates Track 02 Solo-Chill / Voice-Idea endpoint ingestion."""
+    payload = {
+        "idea": "Build voice-driven webhook alerting for mobile Telegram bridge",
+        "author": "@alex",
+        "voice_transcribed": True,
+        "tags": ["feature", "solo-chill", "wispr-flow"],
+    }
+    response = client.post("/api/v1/voice-idea", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ingested"
+    assert data["workflow"] == "solo-chill"
+    assert "dispatched_to" in data
+
+
 def test_zero_division_deterministic_anomaly_behavior():
     """Validates the behavior under poison payload (PROMO100).
 

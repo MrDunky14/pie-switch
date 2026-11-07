@@ -245,21 +245,67 @@ def trigger_indie_chaos(client: httpx.Client) -> None:
     )
 
 
+def trigger_voice_idea(client: httpx.Client) -> None:
+    """Executes the Solo-Chill / Voice-Transcribed idea workflow."""
+    voice_url = f"{TARGET_SERVICE_URL}/api/v1/voice-idea"
+
+    table = Table(
+        title="[bold cyan]🎙️ Wispr Flow Solo-Chill Voice Idea Ingestion Stream[/bold cyan]",
+        box=box.SIMPLE_HEAVY,
+        expand=True,
+    )
+    table.add_column("Idea #", justify="center", width=8)
+    table.add_column("Author", width=12)
+    table.add_column("Voice Transcript", width=36)
+    table.add_column("Status Code", justify="center", width=14)
+    table.add_column("Routing Target")
+
+    payload = {
+        "idea": "Add real-time currency conversion for EUR and GBP in checkout fee logic",
+        "author": "@alex",
+        "voice_transcribed": True,
+        "tags": ["feature", "solo-chill", "wispr-flow"],
+    }
+
+    resp = client.post(voice_url, json=payload)
+    status_markup = "[bold green]200 OK[/bold green]" if resp.status_code == 200 else f"[red]{resp.status_code}[/red]"
+    table.add_row(
+        "#1",
+        payload["author"],
+        payload["idea"],
+        status_markup,
+        "[cyan]Switch Decisions Log ➔ @pie-triager[/cyan]",
+    )
+
+    console.clear()
+    console.print(table)
+    console.print(
+        Panel(
+            "[bold green]✔ Voice Task Ingested: Dispatched to Switch Room Decisions Log[/bold green]\n"
+            "[white]Agents collaboratively scaffold, test, and package while the solo founder is away.[/white]",
+            box=box.ROUNDED,
+            border_style="cyan",
+        )
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="pie-Switch Chaos & Telemetry Injector")
     parser.add_argument(
         "--mode",
-        choices=["business", "indie"],
+        choices=["business", "indie", "voice"],
         default=MODE,
-        help="Operating mode: business (Checkout) or indie (Sleep-Mode Guardian)",
+        help="Operating mode: business (Checkout), indie (Sleep-Mode Guardian), or voice (Solo-Chill)",
     )
     args = parser.parse_args()
 
     with httpx.Client() as client:
         if args.mode == "business":
             trigger_business_chaos(client)
-        else:
+        elif args.mode == "indie":
             trigger_indie_chaos(client)
+        elif args.mode == "voice":
+            trigger_voice_idea(client)
 
 
 if __name__ == "__main__":

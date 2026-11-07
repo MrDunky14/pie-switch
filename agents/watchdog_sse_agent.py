@@ -204,7 +204,7 @@ async def post_to_switch_room(
 # Post-Patch Verification Engine
 # ------------------------------------------------------------------------------
 async def verify_hot_reload_production(client: httpx.AsyncClient) -> Dict[str, Any]:
-    """Sends the previously failing payload to verify live recovery."""
+    """Sends the previously failing payload to verify live recovery with reload retry."""
     repro_payload = incident_state.last_crash_payload or {
         "cart_id": "cart_verify_hot_reload",
         "currency": "USD",
@@ -216,27 +216,45 @@ async def verify_hot_reload_production(client: httpx.AsyncClient) -> Dict[str, A
     target_url = f"{TARGET_SERVICE_URL}{incident_state.last_crash_endpoint}"
     start_t = time.time()
 
-    # Try live HTTP request
-    try:
-        resp = await client.post(target_url, json=repro_payload, timeout=4.0)
-        latency_ms = round((time.time() - start_t) * 1000, 1)
-        if resp.status_code == 200:
-            return {"success": True, "status_code": 200, "latency_ms": latency_ms, "data": resp.json()}
-        else:
-            return {"success": False, "status_code": resp.status_code, "latency_ms": latency_ms}
-    except Exception:
-        # Fall back to in-memory TestClient verification
+    # Retry up to 5 attempts (total 4s) to allow uvicorn file-watcher to complete reload
+    for attempt in range(5):
+        await asyncio.sleep(0.8)
         try:
-            from fastapi.testclient import TestClient
-            import importlib
-            import target_service.app
-            importlib.reload(target_service.app)
-            tc = TestClient(target_service.app.app)
-            r = tc.post(incident_state.last_crash_endpoint, json=repro_payload)
+            resp = await client.post(target_url, json=repro_payload, timeout=4.0)
             latency_ms = round((time.time() - start_t) * 1000, 1)
-            return {"success": r.status_code == 200, "status_code": r.status_code, "latency_ms": latency_ms}
-        except Exception as e:
-            return {"success": False, "error": str(e)}
+            if resp.status_code == 200:
+                return {
+                    "success": True,
+                    "status_code": 200,
+                    "latency_ms": latency_ms,
+                    "data": resp.json(),
+                }
+            elif attempt == 4:
+                return {
+                    "success": False,
+                    "status_code": resp.status_code,
+                    "latency_ms": latency_ms,
+                }
+        except Exception as exc:
+            if attempt == 4:
+                # Fall back to in-memory TestClient verification
+                try:
+                    import importlib
+                    from fastapi.testclient import TestClient
+                    import target_service.app
+                    importlib.reload(target_service.app)
+                    tc = TestClient(target_service.app.app)
+                    r = tc.post(incident_state.last_crash_endpoint, json=repro_payload)
+                    latency_ms = round((time.time() - start_t) * 1000, 1)
+                    return {
+                        "success": r.status_code == 200,
+                        "status_code": r.status_code,
+                        "latency_ms": latency_ms,
+                    }
+                except Exception as e:
+                    return {"success": False, "error": str(e)}
+
+    return {"success": False, "error": "Timeout waiting for hot reload"}
 
 
 # ------------------------------------------------------------------------------
@@ -292,9 +310,10 @@ async def tail_service_log(
                         or entry.get("status_code") == 500
                         or entry.get("severity") in ["P0-CRITICAL", "P1-HIGH"]
                     ):
-                        await handle_detected_anomaly(
-                            entry, http_client, is_sim, auto_approve
-                        )
+                        if not incident_state.active_incident:
+                            await handle_detected_anomaly(
+                                entry, http_client, is_sim, auto_approve
+                            )
 
         except asyncio.CancelledError:
             break

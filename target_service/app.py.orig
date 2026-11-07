@@ -101,6 +101,13 @@ class IndieWebhookRequest(BaseModel):
     metrics: Dict[str, Any] = Field(default_factory=dict)
 
 
+class VoiceIdeaRequest(BaseModel):
+    idea: str = Field(..., example="Implement dynamic currency conversion for EUR and GBP")
+    author: str = Field(default="@alex")
+    voice_transcribed: bool = Field(default=True)
+    tags: List[str] = Field(default_factory=lambda: ["feature", "solo-chill", "wispr-flow"])
+
+
 # ------------------------------------------------------------------------------
 # Core Endpoints
 # ------------------------------------------------------------------------------
@@ -294,6 +301,36 @@ async def indie_webhook(request: IndieWebhookRequest) -> Dict[str, Any]:
         "status": "healthy",
         "repository": request.repository,
         "guardian_mode": "sleep_mode_active",
+        "timestamp": now_str,
+    }
+
+
+@app.post("/api/v1/voice-idea")
+async def voice_idea(request: VoiceIdeaRequest) -> Dict[str, Any]:
+    """Track 02 (Solo-Indie Mode): Voice-Transcribed Task / Idea Dispatcher."""
+    metrics["total_requests"] += 1
+    metrics["successful_requests"] += 1
+    now_str = datetime.now(timezone.utc).isoformat()
+
+    telemetry_entry = {
+        "timestamp": now_str,
+        "level": "INFO",
+        "severity": "PERSONAL-BUILD-TASK",
+        "endpoint": "/api/v1/voice-idea",
+        "status_code": 200,
+        "author": request.author,
+        "idea": request.idea,
+        "voice_transcribed": request.voice_transcribed,
+        "tags": request.tags,
+    }
+    write_service_log(telemetry_entry)
+
+    return {
+        "status": "ingested",
+        "workflow": "solo-chill",
+        "idea": request.idea,
+        "author": request.author,
+        "dispatched_to": "Switch Room Decisions Log",
         "timestamp": now_str,
     }
 

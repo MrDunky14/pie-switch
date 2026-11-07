@@ -41,6 +41,12 @@ chaos:
 chaos-indie:
 	$(PYTHON) scripts/trigger_chaos.py --mode indie
 
+chaos-voice:
+	$(PYTHON) scripts/trigger_chaos.py --mode voice
+
+voice:
+	$(PYTHON) scripts/trigger_chaos.py --mode voice
+
 repro:
 	$(PYTHON) workspace/repro/repro_bug.py
 
