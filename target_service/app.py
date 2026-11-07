@@ -64,6 +64,13 @@ def add_room_event(sender: str, content: str, role: str = "agent") -> None:
         "time": datetime.now(timezone.utc).strftime("%H:%M:%S"),
         "content": content,
     })
+    discord_webhook = os.getenv("DISCORD_WEBHOOK_URL", "https://discord.com/api/webhooks/1568690508841099305/oP3WuISfXV71BtCxuvXzrjnmHj_DKXULTnkC7pnrbZEpfim60beqDbBtINynmdnma88C")
+    if discord_webhook:
+        try:
+            import httpx
+            httpx.post(discord_webhook, json={"username": sender, "content": f"**{sender}**\n{content}"}, timeout=2.0)
+        except Exception:
+            pass
 
 
 def write_service_log(entry: Dict[str, Any]) -> None:
