@@ -441,7 +441,7 @@ async def approve_deploy() -> Dict[str, Any]:
     app_file = Path("target_service/app.py")
     if app_file.exists():
         content = app_file.read_text(encoding="utf-8")
-        buggy_needle = "fee_attribution_ratio = processing_fee / net_subtotal"
+        buggy_needle = "fee_attribution_ratio = processing_fee / " + "net_subtotal"
         fixed_needle = (
             "# SURGICAL FIX: Safe fee attribution ratio calculation\n"
             "        fee_attribution_ratio = (\n"
@@ -492,13 +492,13 @@ async def reset_demo_action() -> Dict[str, Any]:
 
 @app.get("/", response_class=HTMLResponse)
 async def live_dashboard() -> str:
-    """Renders the comprehensive live interactive demo cockpit."""
+    """Renders the comprehensive live interactive demo cockpit with Netflix-grade dark UI."""
     return """<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AegisRoom — Live Interactive Incident War-Room</title>
+  <title>AegisRoom — Autonomous Incident War-Room</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -506,7 +506,13 @@ async def live_dashboard() -> str:
       theme: {
         extend: {
           colors: {
-            brand: { 500: '#6366f1', 600: '#4f46e5' }
+            netflix: {
+              red: '#E50914',
+              darkred: '#B81D24',
+              black: '#141414',
+              card: '#181818',
+              border: '#2f2f2f'
+            }
           }
         }
       }
@@ -514,61 +520,76 @@ async def live_dashboard() -> str:
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+    @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
     .pulse-status { animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    body { background-color: #141414; }
+    .glow-red { box-shadow: 0 0 25px rgba(229, 9, 20, 0.35); }
+    .glow-green { box-shadow: 0 0 25px rgba(16, 185, 129, 0.35); }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans antialiased">
-  <!-- Top Navigation Bar -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-6 py-3.5 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
-        🛡️
+<body class="text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-red-600 selection:text-white">
+  <!-- Top Navigation Bar (Netflix Cinematic Style) -->
+  <header class="border-b border-[#232323] bg-[#141414]/95 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-[#E50914] to-[#B81D24] flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-red-600/30">
+        N
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="font-bold text-lg text-white tracking-tight">AegisRoom</h1>
-          <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">pie-Switch</span>
+          <h1 class="font-extrabold text-xl text-white tracking-wider uppercase font-mono">AegisRoom</h1>
+          <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/40 uppercase tracking-widest">Flip the Switch</span>
         </div>
-        <p class="text-xs text-slate-400">Autonomous Incident War-Room & DevSecOps Co-Pilot</p>
+        <p class="text-xs text-neutral-400">Autonomous Incident War-Room & Personal DevSecOps Co-Pilot</p>
       </div>
     </div>
     <div class="flex items-center gap-4">
-      <div id="statusBadge" class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+      <div id="statusBadge" class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
         <span class="h-2 w-2 rounded-full bg-emerald-400 pulse-status"></span>
         <span id="statusText">SYSTEM HEALTHY</span>
       </div>
-      <a href="https://github.com/MrDunky14/pie-switch" target="_blank" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
-        <i class="fab fa-github"></i> GitHub Repo
+      <a href="https://github.com/MrDunky14/pie-switch" target="_blank" class="text-xs font-semibold px-4 py-2 rounded-lg bg-[#222] hover:bg-[#333] text-white border border-[#333] flex items-center gap-2 transition duration-200">
+        <i class="fab fa-github text-sm"></i> GitHub
       </a>
     </div>
   </header>
 
+  <!-- Hero Category Billboard -->
+  <div class="px-6 py-2 bg-gradient-to-r from-[#181818] via-[#141414] to-[#181818] border-b border-[#222] text-[11px] font-mono text-neutral-400 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-[#E50914] font-bold"><i class="fas fa-fire"></i> TOP 10 INCIDENTS TODAY</span>
+      <span>•</span>
+      <span>#1 Production Checkout DivisionByZero (Severity: P0-CRITICAL)</span>
+    </div>
+    <div class="flex items-center gap-2 text-neutral-500">
+      <i class="fas fa-tv"></i> Switch Agent Protocol (SSE In / HTTP Out)
+    </div>
+  </div>
+
   <!-- Main Grid Layout -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
     <!-- Left Column: Switch War Room Chat (7 cols) -->
-    <section class="lg:col-span-7 flex flex-col bg-slate-900/60 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl backdrop-blur">
-      <div class="px-5 py-3.5 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-slate-400"><i class="fas fa-hashtag text-indigo-400"></i></span>
-          <span class="font-semibold text-sm text-slate-200">pie-war-room</span>
-          <span class="text-xs text-slate-500 font-mono">| Switch Protocol SSE In/HTTP Out</span>
+    <section class="lg:col-span-7 flex flex-col bg-[#181818] rounded-2xl border border-[#262626] overflow-hidden shadow-2xl">
+      <div class="px-5 py-3.5 border-b border-[#262626] bg-[#1c1c1c] flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="h-2.5 w-2.5 rounded-full bg-[#E50914]"></span>
+          <span class="font-bold text-sm text-neutral-200 tracking-wide"># pie-war-room</span>
+          <span class="text-xs text-neutral-500 font-mono">| Live Stream Log</span>
         </div>
-        <div class="flex items-center gap-2 text-xs text-slate-400">
-          <span class="h-2 w-2 rounded-full bg-indigo-400"></span> 4 Agents + 1 Human
+        <div class="flex items-center gap-2 text-xs font-medium text-neutral-400">
+          <span class="h-2 w-2 rounded-full bg-indigo-500"></span> 4 Agents • 1 Human Lead
         </div>
       </div>
 
       <!-- Messages Stream -->
-      <div id="chatFeed" class="flex-1 p-5 overflow-y-auto space-y-4 max-h-[640px] font-sans">
-        <div class="text-center py-8 text-slate-500 text-xs">Connecting to Switch Room Stream...</div>
+      <div id="chatFeed" class="flex-1 p-5 overflow-y-auto space-y-3.5 max-h-[620px] font-sans">
+        <div class="text-center py-8 text-neutral-500 text-xs font-mono">Connecting to Switch Room Stream...</div>
       </div>
 
-      <!-- Chat Prompt Box (Simulation) -->
-      <div class="p-4 border-t border-slate-800 bg-slate-900/90 flex gap-2">
-        <input id="chatInput" type="text" value='Approved. Deploy patch.' class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" placeholder="Type room command...">
-        <button onclick="approveDeploy()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
-          <i class="fas fa-paper-plane"></i> Send Approval
+      <!-- Chat Prompt Box -->
+      <div class="p-4 border-t border-[#262626] bg-[#1c1c1c] flex gap-2.5">
+        <input id="chatInput" type="text" value='Approved. Deploy patch.' class="flex-1 bg-[#121212] border border-[#333] rounded-xl px-4 py-2.5 text-sm text-neutral-200 focus:outline-none focus:border-[#E50914]" placeholder="Type human authorization...">
+        <button onclick="approveDeploy()" class="px-5 py-2.5 bg-[#E50914] hover:bg-[#b81d24] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-red-600/30 transition flex items-center gap-2">
+          <i class="fas fa-play"></i> Send Approval
         </button>
       </div>
     </section>
@@ -576,67 +597,67 @@ async def live_dashboard() -> str:
     <!-- Right Column: Interactive Cockpit & Telemetry (5 cols) -->
     <section class="lg:col-span-5 flex flex-col gap-6">
       <!-- Chaos & Action Control Card -->
-      <div class="bg-slate-900/60 rounded-2xl border border-slate-800 p-5 shadow-xl backdrop-blur">
-        <h2 class="text-xs uppercase font-mono font-bold tracking-wider text-slate-400 mb-4 flex items-center gap-2">
-          <i class="fas fa-gamepad text-indigo-400"></i> Live Demo Cockpit
+      <div class="bg-[#181818] rounded-2xl border border-[#262626] p-5 shadow-xl">
+        <h2 class="text-xs uppercase font-mono font-bold tracking-widest text-[#E50914] mb-4 flex items-center gap-2">
+          <i class="fas fa-play-circle"></i> Incident Control Center
         </h2>
         <div class="flex flex-col gap-3">
-          <button onclick="triggerChaos()" class="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-lg shadow-red-600/20 transition flex items-center justify-center gap-2">
-            <i class="fas fa-bolt"></i> 1. Trigger Production Chaos (HTTP 500)
+          <button onclick="triggerChaos()" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-[#E50914] to-[#B81D24] hover:from-[#f40612] hover:to-[#c61a21] text-white shadow-lg shadow-red-600/30 transition flex items-center justify-center gap-2 uppercase tracking-wide">
+            <i class="fas fa-bolt"></i> 1. Trigger Production Chaos (500 Error)
           </button>
           
-          <button onclick="approveDeploy()" class="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2">
-            <i class="fas fa-check-double"></i> 2. Authorize Hot-Reload ("Approved")
+          <button onclick="approveDeploy()" class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 uppercase tracking-wide">
+            <i class="fas fa-check-circle"></i> 2. Authorize Hot-Reload ("Approved")
           </button>
 
           <div class="grid grid-cols-2 gap-3 mt-1">
-            <button onclick="sendNormalOrder()" class="py-2.5 px-3 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center justify-center gap-1.5">
+            <button onclick="sendNormalOrder()" class="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[#222] hover:bg-[#2a2a2a] text-neutral-200 border border-[#333] transition flex items-center justify-center gap-1.5">
               <i class="fas fa-shopping-cart text-cyan-400"></i> Normal Order ($100)
             </button>
-            <button onclick="sendVoiceIdea()" class="py-2.5 px-3 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center justify-center gap-1.5">
-              <i class="fas fa-microphone text-indigo-400"></i> Voice Idea (/solo)
+            <button onclick="sendVoiceIdea()" class="py-2.5 px-3 rounded-xl text-xs font-semibold bg-[#222] hover:bg-[#2a2a2a] text-neutral-200 border border-[#333] transition flex items-center justify-center gap-1.5">
+              <i class="fas fa-microphone text-fuchsia-400"></i> Voice Idea (/solo)
             </button>
           </div>
 
-          <button onclick="resetDemo()" class="mt-2 py-2 px-3 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-slate-800 transition flex items-center justify-center gap-1.5">
+          <button onclick="resetDemo()" class="mt-2 py-2 px-3 rounded-xl text-xs font-medium text-neutral-400 hover:text-white hover:bg-[#222] border border-[#2a2a2a] transition flex items-center justify-center gap-1.5">
             <i class="fas fa-redo"></i> Reset Demo to Baseline Buggy State
           </button>
         </div>
       </div>
 
-      <!-- Real-Time Telemetry Counters -->
-      <div class="bg-slate-900/60 rounded-2xl border border-slate-800 p-5 shadow-xl backdrop-blur">
-        <h2 class="text-xs uppercase font-mono font-bold tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-          <i class="fas fa-chart-line text-cyan-400"></i> Telemetry & Health Metrics
+      <!-- Real-Time Telemetry Counters (Netflix Cinema Style) -->
+      <div class="bg-[#181818] rounded-2xl border border-[#262626] p-5 shadow-xl">
+        <h2 class="text-xs uppercase font-mono font-bold tracking-widest text-neutral-400 mb-3 flex items-center gap-2">
+          <i class="fas fa-tachometer-alt text-cyan-400"></i> Telemetry & Health Metrics
         </h2>
         <div class="grid grid-cols-2 gap-3 text-center">
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div class="text-xs text-slate-400 font-mono">TOTAL REQUESTS</div>
-            <div id="statTotal" class="text-xl font-bold text-white mt-1">0</div>
+          <div class="p-3.5 rounded-xl bg-[#121212] border border-[#262626]">
+            <div class="text-[11px] text-neutral-400 font-mono tracking-wider">TOTAL REQUESTS</div>
+            <div id="statTotal" class="text-2xl font-black text-white mt-1">0</div>
           </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div class="text-xs text-slate-400 font-mono">FAILED (500)</div>
-            <div id="statFailed" class="text-xl font-bold text-rose-400 mt-1">0</div>
+          <div class="p-3.5 rounded-xl bg-[#121212] border border-[#262626]">
+            <div class="text-[11px] text-neutral-400 font-mono tracking-wider">FAILED (500)</div>
+            <div id="statFailed" class="text-2xl font-black text-rose-500 mt-1">0</div>
           </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div class="text-xs text-slate-400 font-mono">UPTIME</div>
-            <div id="statUptime" class="text-xl font-bold text-indigo-400 mt-1">0s</div>
+          <div class="p-3.5 rounded-xl bg-[#121212] border border-[#262626]">
+            <div class="text-[11px] text-neutral-400 font-mono tracking-wider">UPTIME</div>
+            <div id="statUptime" class="text-2xl font-black text-indigo-400 mt-1">0s</div>
           </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-            <div class="text-xs text-slate-400 font-mono">HOTFIX STATUS</div>
-            <div id="statPatched" class="text-sm font-bold text-amber-400 mt-2">UNPATCHED</div>
+          <div class="p-3.5 rounded-xl bg-[#121212] border border-[#262626]">
+            <div class="text-[11px] text-neutral-400 font-mono tracking-wider">HOTFIX STATUS</div>
+            <div id="statPatched" class="text-xs font-extrabold text-amber-400 mt-2 tracking-wide">READY (LATENT)</div>
           </div>
         </div>
       </div>
 
       <!-- Architecture Card -->
-      <div class="bg-slate-900/40 rounded-2xl border border-slate-800 p-4 text-xs text-slate-400 space-y-2 font-mono">
-        <div class="text-slate-300 font-bold flex items-center gap-2">
-          <i class="fas fa-shield-alt text-indigo-400"></i> Psychological UX Rules
+      <div class="bg-[#181818]/60 rounded-2xl border border-[#262626] p-4 text-xs text-neutral-400 space-y-2 font-mono">
+        <div class="text-neutral-200 font-bold flex items-center gap-2">
+          <i class="fas fa-shield-alt text-[#E50914]"></i> Psychological UX Guardrails
         </div>
-        <p>• <b>3-Line Contract:</b> Status ➔ Root Cause ➔ Handoff</p>
-        <p>• <b>Addressing Scopes:</b> Specialist agents remain silent until @mentioned</p>
-        <p>• <b>Human Gate:</b> AI cannot deploy without human sign-off</p>
+        <p>• <b>3-Line Contract:</b> Status ➔ Root Cause ➔ Deterministic Handoff</p>
+        <p>• <b>Addressing Scopes:</b> Specialist agents silent until tagged</p>
+        <p>• <b>Human Gate:</b> AI blocked from prod deployment until human approves</p>
       </div>
     </section>
   </main>
@@ -647,8 +668,8 @@ async def live_dashboard() -> str:
       '@pie-triager': 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30',
       '@pie-repro': 'bg-amber-500/10 text-amber-400 border-amber-500/30',
       '@pie-patcher': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
-      '@alex': 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-bold',
-      'system': 'bg-slate-800 text-slate-300 border-slate-700'
+      '@alex': 'bg-[#E50914]/20 text-rose-300 border-[#E50914]/40 font-bold',
+      'system': 'bg-[#222] text-neutral-300 border-[#333]'
     };
 
     let lastEventCount = 0;
@@ -669,19 +690,19 @@ async def live_dashboard() -> str:
 
         if (data.metrics.is_patched) {
           statPatched.innerText = 'VERIFIED HOTFIX';
-          statPatched.className = 'text-sm font-bold text-emerald-400 mt-2';
-          badge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
-          badgeText.innerText = 'SYSTEM HEALED (200 OK)';
+          statPatched.className = 'text-xs font-extrabold text-emerald-400 mt-2 tracking-wide';
+          badge.className = 'flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-green';
+          badgeText.innerText = 'HOT-RELOAD VERIFIED (200 OK)';
         } else if (data.metrics.failed_requests > 0) {
           statPatched.innerText = 'BUG TRIGGERED';
-          statPatched.className = 'text-sm font-bold text-rose-400 mt-2';
-          badge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30';
-          badgeText.innerText = 'P0-CRITICAL INCIDENT';
+          statPatched.className = 'text-xs font-extrabold text-rose-500 mt-2 tracking-wide';
+          badge.className = 'flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-red-600/20 text-red-500 border border-red-500/40 glow-red';
+          badgeText.innerText = 'P0-CRITICAL ANOMALY';
         } else {
           statPatched.innerText = 'READY (LATENT BUG)';
-          statPatched.className = 'text-sm font-bold text-amber-400 mt-2';
-          badge.className = 'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30';
-          badgeText.innerText = 'SYSTEM ONLINE';
+          statPatched.className = 'text-xs font-extrabold text-amber-400 mt-2 tracking-wide';
+          badge.className = 'flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase bg-cyan-500/10 text-cyan-400 border border-cyan-500/30';
+          badgeText.innerText = 'SYSTEM HEALTHY';
         }
 
         // Render messages
@@ -689,27 +710,27 @@ async def live_dashboard() -> str:
           lastEventCount = data.events.length;
           const feed = document.getElementById('chatFeed');
           feed.innerHTML = data.events.map(ev => {
-            const badgeClass = colorMap[ev.sender] || 'bg-slate-800 text-slate-300 border-slate-700';
+            const badgeClass = colorMap[ev.sender] || 'bg-[#222] text-neutral-300 border-[#333]';
             const lines = ev.content.split('\\n');
             const formattedContent = lines.map(line => {
               if (line.startsWith('Handoff:') || line.startsWith('Action Required:')) {
-                return `<div class="font-semibold text-indigo-300 mt-1">${line}</div>`;
+                return `<div class="font-bold text-[#E50914] mt-1">${line}</div>`;
               } else if (line.startsWith('Artifact:')) {
-                return `<div class="text-xs text-slate-400 font-mono mt-0.5">${line}</div>`;
+                return `<div class="text-xs text-neutral-400 font-mono mt-0.5">${line}</div>`;
               } else {
                 return `<div>${line}</div>`;
               }
             }).join('');
 
             return `
-              <div class="flex flex-col gap-1.5 p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 shadow-sm transition">
+              <div class="flex flex-col gap-1.5 p-3.5 rounded-xl bg-[#141414] border border-[#2a2a2a] shadow-sm transition">
                 <div class="flex items-center justify-between">
-                  <span class="px-2 py-0.5 rounded-md text-xs font-mono font-medium border ${badgeClass}">
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider border ${badgeClass}">
                     ${ev.sender}
                   </span>
-                  <span class="text-[10px] text-slate-500 font-mono">${ev.time}</span>
+                  <span class="text-[10px] text-neutral-500 font-mono">${ev.time}</span>
                 </div>
-                <div class="text-xs text-slate-200 leading-relaxed font-sans mt-0.5">
+                <div class="text-xs text-neutral-200 leading-relaxed font-sans mt-0.5">
                   ${formattedContent}
                 </div>
               </div>

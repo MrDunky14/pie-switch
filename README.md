@@ -18,6 +18,10 @@
 * **Local Web Dashboard:** `http://localhost:8080/` *(run `python target_service/app.py`)*  
 * **90-Second Demo Video:** [Watch on YouTube / Loom](https://youtu.be/YOUR_DEMO_VIDEO_LINK)  
 
+<p align="center">
+  <img src="./assets/demo_screenshot.png" alt="AegisRoom Netflix-Style Live Incident War Room" width="100%" style="border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(229, 9, 20, 0.25);" />
+</p>
+
 ---
 
 ## 💡 The Real Problem: Why 2 AM Outages in Slack Are Broken
